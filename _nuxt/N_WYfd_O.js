@@ -29795,6 +29795,7 @@ class SoundManager {
     };
 
     document.addEventListener('visibilitychange', this._handleVisibilityChange);
+    this.createNativeSound('ambient');
   }
 
   destroy() {
@@ -29897,10 +29898,11 @@ class SoundManager {
     const src = SOUNDS[soundId]?.src?.mp3 || SOUNDS[soundId]?.src?.webm;
     if (!src) return null
 
-    const audio = new Audio(src);
+    const audio = new Audio();
     audio.loop = LOOP_SOUND_IDS.includes(soundId);
     audio.preload = 'auto';
     audio.volume = Math.min(1, (SOUNDS[soundId].volume || 1) * this.volume.current);
+    audio.src = src;
 
     audio.addEventListener('playing', () => {
       this.playRequests[soundId] = false;
@@ -29913,6 +29915,8 @@ class SoundManager {
     });
 
     this.nativeSounds[soundId] = audio;
+    audio.load();
+
     return audio
   }
 
