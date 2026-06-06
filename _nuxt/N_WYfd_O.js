@@ -29747,6 +29747,19 @@ const SOUNDS = {
   }
 };
 
+const LOOP_SOUND_IDS = [
+  'ambient',
+  'heroLoop',
+  'investorsLoop',
+  'portfolioLoop',
+  'teamFooterLoop',
+  'rockOpenedLoop',
+  'particlesLoop',
+  'particlesLoop_investors',
+  'particlesLoop_portfolio',
+  'particlesLoop_outro'
+];
+
 class SoundManager {
   constructor(getIsMuted = () => false) {
     this.getIsMuted = getIsMuted;
@@ -29825,6 +29838,7 @@ class SoundManager {
     }
 
     if (this.sounds[soundId]) {
+      if (LOOP_SOUND_IDS.includes(soundId) && this.sounds[soundId].playing()) return
       this.sounds[soundId].play();
     } else if (!this.loading[soundId]) {
       this.loadSound(soundId);
@@ -29840,18 +29854,7 @@ class SoundManager {
     this.sounds[soundId] = new howlerExports.Howl({
       src: [SOUNDS[soundId].src.webm, SOUNDS[soundId].src.mp3],
       volume: SOUNDS[soundId].volume || 1,
-      loop: [
-        'ambient',
-        'heroLoop',
-        'investorsLoop',
-        'portfolioLoop',
-        'teamFooterLoop',
-        'rockOpenedLoop',
-        'particlesLoop',
-        'particlesLoop_investors',
-        'particlesLoop_portfolio',
-        'particlesLoop_outro'
-      ].includes(soundId),
+      loop: LOOP_SOUND_IDS.includes(soundId),
       onload: () => {
         this.loading[soundId] = false;
 
