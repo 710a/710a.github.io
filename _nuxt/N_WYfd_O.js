@@ -29565,10 +29565,10 @@ const SOCIAL_SHARE_FALLBACK = '/images/social-share.jpg';
 const SOUNDS = {
   ambient: {
     src: {
-      webm: '/sounds/webm/Music_Ambient_Loop.webm',
-      mp3: '/sounds/mp3/Music_Ambient_Loop.mp3'
+      webm: '/sounds/mp3/JackLNDN-Hit-Refresh.mp3',
+      mp3: '/sounds/mp3/JackLNDN-Hit-Refresh.mp3'
     },
-    volume: 0.5
+    volume: 0.45
   },
   click: {
     src: {
@@ -29833,7 +29833,7 @@ class SoundManager {
 
   loadSound(soundId = null, { autoplay = true } = {}) {
     if (!soundId || !SOUNDS[soundId]) return
-    if (!window.__HASHGRAPH_ENABLE_MISSING_SOUNDS__) return
+    if (!window.__HASHGRAPH_ENABLE_MISSING_SOUNDS__ && soundId !== 'ambient') return
 
     this.loading[soundId] = true;
 
