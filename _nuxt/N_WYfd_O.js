@@ -29766,6 +29766,8 @@ class SoundManager {
 
     this.sounds = {}; // ? Howl instances
     this.loading = {}; // ? Loading states, to avoid duplicates
+    this.nativeSounds = {};
+    this.playRequests = {};
 
     this.isUserEngaged = false;
     this.isMuted = true;
@@ -29780,6 +29782,8 @@ class SoundManager {
           this._mutedByVisibility = true;
           gsapWithCSS.killTweensOf(this.volume);
           this.volume.current = 0;
+          this.setMasterVolume(this.volume.current);
+          this.setNativeMuted(true);
           howlerExports.Howler.mute(true);
         }
       } else {
@@ -29807,9 +29811,10 @@ class SoundManager {
     gsapWithCSS.to(this.volume, {
       current: 0,
       onUpdate: () => {
-        howlerExports.Howler.volume(this.volume.current);
+        this.setMasterVolume(this.volume.current);
       },
       onComplete: () => {
+        this.setNativeMuted(true);
         howlerExports.Howler.mute(true);
       }
     });
@@ -29819,12 +29824,13 @@ class SoundManager {
     this.isMuted = false;
 
     howlerExports.Howler.mute(false);
+    this.setNativeMuted(false);
 
     gsapWithCSS.killTweensOf(this.volume);
     gsapWithCSS.to(this.volume, {
       current: 0.5,
       onUpdate: () => {
-        howlerExports.Howler.volume(this.volume.current);
+        this.setMasterVolume(this.volume.current);
       }
     });
   }
@@ -29834,12 +29840,16 @@ class SoundManager {
 
     if (!this.isUserEngaged) {
       this.isUserEngaged = true;
-      howlerExports.Howler.volume(this.volume.current);
+      this.setMasterVolume(this.volume.current);
+    }
+
+    if (soundId === 'ambient') {
+      this.startAmbientSound();
+      return
     }
 
     if (this.sounds[soundId]) {
-      if (LOOP_SOUND_IDS.includes(soundId) && this.sounds[soundId].playing()) return
-      this.sounds[soundId].play();
+      this.startSound(soundId);
     } else if (!this.loading[soundId]) {
       this.loadSound(soundId);
     }
@@ -29847,6 +29857,15 @@ class SoundManager {
 
   loadSound(soundId = null, { autoplay = true } = {}) {
     if (!soundId || !SOUNDS[soundId]) return
+
+    if (soundId === 'ambient') {
+      this.createNativeSound(soundId);
+      if (autoplay && !this.getIsMuted()) {
+        this.startAmbientSound();
+      }
+      return
+    }
+
     if (!window.__HASHGRAPH_ENABLE_MISSING_SOUNDS__ && soundId !== 'ambient') return
 
     this.loading[soundId] = true;
@@ -29857,26 +29876,122 @@ class SoundManager {
       loop: LOOP_SOUND_IDS.includes(soundId),
       onload: () => {
         this.loading[soundId] = false;
+      },
+      onplay: () => {
+        this.playRequests[soundId] = false;
+      },
+      onplayerror: () => {
+        this.playRequests[soundId] = false;
+      }
+    });
 
-        if (!autoplay || this.getIsMuted()) return
+    if (autoplay && !this.getIsMuted()) {
+      this.startSound(soundId);
+    }
+  }
 
-        this.sounds[soundId]?.play();
+  createNativeSound(soundId) {
+    if (this.nativeSounds[soundId]) return this.nativeSounds[soundId]
+    if (typeof Audio === 'undefined') return null
 
-        // ? fade in ambient sound
-        if (soundId === 'ambient') {
-          this.sounds[soundId]?.fade(0, SOUNDS[soundId].volume, 500);
-        }
+    const src = SOUNDS[soundId]?.src?.mp3 || SOUNDS[soundId]?.src?.webm;
+    if (!src) return null
+
+    const audio = new Audio(src);
+    audio.loop = LOOP_SOUND_IDS.includes(soundId);
+    audio.preload = 'auto';
+    audio.volume = Math.min(1, (SOUNDS[soundId].volume || 1) * this.volume.current);
+
+    audio.addEventListener('playing', () => {
+      this.playRequests[soundId] = false;
+    });
+    audio.addEventListener('pause', () => {
+      this.playRequests[soundId] = false;
+    });
+    audio.addEventListener('error', () => {
+      this.playRequests[soundId] = false;
+    });
+
+    this.nativeSounds[soundId] = audio;
+    return audio
+  }
+
+  startAmbientSound() {
+    const soundId = 'ambient';
+    const audio = this.createNativeSound(soundId);
+    if (!audio || !audio.paused || this.playRequests[soundId]) return
+
+    this.playRequests[soundId] = true;
+    audio.muted = false;
+    this.setMasterVolume(this.volume.current);
+
+    const playPromise = audio.play();
+    if (playPromise && typeof playPromise.then === 'function') {
+      playPromise
+        .then(() => {
+          this.playRequests[soundId] = false;
+        })
+        .catch(() => {
+          this.playRequests[soundId] = false;
+        });
+    } else {
+      this.playRequests[soundId] = false;
+    }
+  }
+
+  startSound(soundId) {
+    if (!this.sounds[soundId]) return
+
+    const isLoopSound = LOOP_SOUND_IDS.includes(soundId);
+    if (isLoopSound && (this.sounds[soundId].playing() || this.playRequests[soundId])) return
+
+    if (isLoopSound) {
+      this.playRequests[soundId] = true;
+    }
+
+    const playId = this.sounds[soundId].play();
+
+    if (soundId === 'ambient') {
+      this.sounds[soundId]?.fade(0, SOUNDS[soundId].volume, 500, playId);
+    }
+  }
+
+  setMasterVolume(volume) {
+    howlerExports.Howler.volume(volume);
+    Object.keys(this.nativeSounds).forEach((soundId) => {
+      const audio = this.nativeSounds[soundId];
+      if (audio) {
+        audio.volume = Math.min(1, (SOUNDS[soundId]?.volume || 1) * volume);
+      }
+    });
+  }
+
+  setNativeMuted(isMuted) {
+    Object.keys(this.nativeSounds).forEach((soundId) => {
+      const audio = this.nativeSounds[soundId];
+      if (audio) {
+        audio.muted = isMuted;
       }
     });
   }
 
   setSoundVolume(soundId, volume) {
+    if (this.nativeSounds[soundId]) {
+      this.nativeSounds[soundId].volume = Math.min(1, volume * this.volume.current);
+      return
+    }
+
     if (this.sounds[soundId]) {
       this.sounds[soundId].volume(volume);
     }
   }
 
   pauseSound(soundId) {
+    if (this.nativeSounds[soundId]) {
+      this.nativeSounds[soundId].pause();
+      return
+    }
+
     if (this.sounds[soundId]) {
       this.sounds[soundId].pause();
     }
