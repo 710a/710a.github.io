@@ -13646,8 +13646,8 @@ const scriptRel = 'modulepreload';const assetsURL = function(dep, importerUrl) {
 
 const _routes = [
   {
-    name: "companies-slug",
-    path: "/companies/:slug()",
+    name: "profile-slug",
+    path: "/profile/:slug()",
     component: () => __vitePreload(() => import('./CD6jqhvg.js'),true              ?__vite__mapDeps([0,1,2,3,4]):void 0,import.meta.url)
   },
   {
@@ -13843,7 +13843,7 @@ const transition_45global = defineNuxtRouteMiddleware((to, from) => {
   const transition = usePageTransition();
 
   const isHome = (r) => r?.name === 'index';
-  const isCompaniesSlug = (r) => r?.name === 'companies-slug';
+  const isCompaniesSlug = (r) => r?.name === 'profile-slug';
 
   if (
     (isHome(from) && isCompaniesSlug(to)) ||
@@ -29559,7 +29559,7 @@ function requireHowler () {
 
 var howlerExports = requireHowler();
 
-const DOMAIN_NAME = 'https://hashgraphvc.com/';
+const DOMAIN_NAME = 'https://710a.github.io/';
 const SOCIAL_SHARE_FALLBACK = '/images/social-share.jpg';
 
 const SOUNDS = {
@@ -76355,11 +76355,11 @@ class HomeView {
     // postIntroMin. Cleared once the user scrolls past postIntroMin naturally.
     this.introInterruptedAt = null;
 
-    // Snap point id to target when playIntroAnimation runs (e.g. direct URL nav to company page)
+    // Snap point id to target when playIntroAnimation runs (e.g. direct URL nav to profile page)
     // Detect at construction time so we don't depend on event timing
     this.pendingSnapId =
       typeof window !== 'undefined' &&
-      window.location.pathname.startsWith('/companies/')
+      window.location.pathname.includes('/profile/')
         ? 'portfolio'
         : null;
 
@@ -76436,7 +76436,7 @@ class HomeView {
     this.snapSettingsUnsubscribe = () =>
       dispatcherSingleton.off('snapSettingsUpdate', onSnapSettingsUpdate);
 
-    // Disable scroll when entering a company page, re-enable on leave
+    // Disable scroll when entering a profile page, re-enable on leave
     const onCompanyEnter = ({ duration } = {}) => {
       this.disableScroll();
       // On history navigation (intro already done), snap scroll to portfolio position
@@ -76780,7 +76780,7 @@ class HomeView {
 
     // Always forward the current scroll position to the compositor so that
     // GSAP-driven animations (e.g. playIntroAnimation) are reflected even
-    // while scroll is disabled (e.g. when landing directly on a company page).
+    // while scroll is disabled (e.g. when landing directly on a profile page).
     const normalizedScroll = this.scroll.currentY / this.scroll.total;
 
     // Send scroll progress to compositor
@@ -77165,7 +77165,7 @@ const _hoisted_1$3 = {
 
 function render(_ctx, _cache) {
   return (openBlock(), createElementBlock("svg", _hoisted_1$3, [...(_cache[0] || (_cache[0] = [
-    createBaseVNode("path", { d: "M23.898 0c1.274 0 2.45.68 3.086 1.783l3.721 6.457c.182.315.277.666.285 1.018l9.318-.001c.824 0 1.338.893.924 1.605L29.826 30.488a3.56 3.56 0 0 1-3.08 1.772h-7.463c-.374 0-.734-.098-1.048-.275l-4.604 7.978a1.07 1.07 0 0 1-1.851 0L.477 20.385a3.56 3.56 0 0 1-.009-3.546l3.71-6.501c.19-.333.461-.602.781-.788l12.472 21.64c.195.338.475.61.804.795l12.47-21.61c.199-.345.294-.732.285-1.117L6.033 9.26c-.384 0-.753.103-1.074.29L.379 1.602A1.068 1.068 0 0 1 1.303 0z" }, null, -1)
+    createBaseVNode("path", { d: "M8 6h4v11h10V6h4v29h-4V22H12v13H8V6Zm23 0h4v22c0 5.1-3 8-8 8-3.2 0-5.7-1.2-7.3-3.6l3.1-2.3c1 1.5 2.4 2.2 4.2 2.2 2.7 0 4-1.5 4-4.4V6Z" }, null, -1)
   ]))]))
 }
 const LogoSvg = { render: render };
@@ -77379,7 +77379,7 @@ return (_ctx, _cache) => {
                     createBaseVNode("div", _hoisted_7$1, [
                       createVNode(_component_TextSplitter, {
                         class: "loader__title ff-title",
-                        content: "github<br /> hashgraphvc",
+                        content: "HU JIANLE<br /> SOFTWARE",
                         "content-tag": "p",
                         type: "chars",
                         "char-class": "anim-fade",
@@ -77810,13 +77810,13 @@ const _sfc_main$1 = {
 const props = __props;
 
 const title = computed(() =>
-  props.error.statusCode === 404 ? 'Page not<br /> found' : 'Something<br /> went wrong'
+  props.error.statusCode === 404 ? '页面<br />不存在' : '页面<br />出错'
 );
 
 const description = computed(() =>
   props.error.statusCode === 404
-    ? 'The page you\'re looking for doesn\'t exist or has been moved.'
-    : 'An unexpected error occurred. Please try again later.'
+    ? '当前页面不存在或已经移动。'
+    : '页面发生异常，请稍后再试。'
 );
 
 const goHome = () => {
@@ -77836,13 +77836,13 @@ return (_ctx, _cache) => {
         createBaseVNode("p", _hoisted_5, toDisplayString(unref(description)), 1),
         createBaseVNode("div", _hoisted_6, [
           createVNode(_component_BaseButton, {
-            label: "Go back home",
+            label: "返回首页",
             "on-click": goHome
           })
         ])
       ]),
       createBaseVNode("div", _hoisted_7, [
-        createBaseVNode("p", _hoisted_8, toDisplayString(__props.error.statusCode) + " — " + toDisplayString(__props.error.statusMessage || 'An unexpected error occurred'), 1)
+        createBaseVNode("p", _hoisted_8, toDisplayString(__props.error.statusCode) + " — " + toDisplayString(__props.error.statusMessage || '出现未知错误'), 1)
       ])
     ]),
     createVNode(unref(LogoSvg), {

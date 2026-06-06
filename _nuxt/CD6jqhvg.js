@@ -791,6 +791,68 @@ const formattedUrl = computed(
     null
 );
 
+const makeDetailBlocks = (items) => items.map((text, index) => ({
+  _key: `detail-block-${index}`,
+  _type: 'block',
+  children: [
+    {
+      _key: `detail-span-${index}`,
+      _type: 'span',
+      marks: [],
+      text
+    }
+  ],
+  markDefs: [],
+  style: 'normal'
+}));
+
+const detailCopyDefaults = {
+  '教育背景': [
+    '本科阶段就读于西北工业大学软件工程专业，时间为 2022 年 9 月至 2026 年 6 月，综合排名 62/266。',
+    '已推免至西北工业大学软件工程硕士阶段，计划 2026 年 9 月至 2029 年 6 月继续学习。',
+    '英语四级 605、英语六级 552，计算机三级数据库技术优秀；硕士导师为徐韬，实验室为智能感知交互实验室。'
+  ],
+  '技术能力': [
+    '熟练掌握 C、Java 开发技术，能够进行基础的软件架构设计。',
+    '熟悉 PostgreSQL，遇到数据库问题时会结合源码定位原因。',
+    '熟悉 Bootstrap、Vue3 和 Linux 操作系统，可以独立完成前端网页开发与常规开发环境使用。'
+  ],
+  '项目经历': [
+    '项目一｜四川华迪智慧康养平台：2025 年 9 月在四川华迪公司大数据开发部门担任 Python 开发实习生，带领小组完成抗疫防疫智慧康养平台；通过爬虫采集数据，并用可视化大屏展示疫情与老年康养相关统计信息。',
+    '项目二｜YOLOv8 与 NCNN 工业缺陷检测系统：2025 年 5 月至 6 月作为开发人员完成基于 YOLOv8 与 NCNN 的 Android 工业缺陷检测系统，接入 OpenCV、Camera2 API、Vulkan、本地存储和相册访问。'
+  ],
+  '荣誉成果': [
+    '2026.06｜优秀毕业生。',
+    '2025.11｜本科生国家奖学金、校级一等奖学金、校级优秀大学生、学业先进个人。',
+    '2025.05｜优秀共青团员。',
+    '2025｜MCM Contest Honorable Mention、第十六届蓝桥杯视觉艺术设计赛省二、“金种子杯”大学生创业大赛省优胜、程序设计实验技能竞赛校二；软件著作权两项。',
+    '2024.11｜校级二等奖学金、校级优秀大学生、学业先进个人、学业进步先进个人、崇德先进个人。',
+    '2024.05｜优秀共青团员。',
+    '2024｜全国大学生软件测试大赛开发者测试个人赛国三；软件著作权一项。'
+  ]
+};
+
+const detailInfoDefaults = {
+  '教育背景': { first: ['时间', '2022 - 2029'], second: ['身份', '本科 / 推免硕士'], third: ['要点', '排名 62/266'] },
+  '技术能力': { first: ['语言', 'C / Java'], second: ['数据库', 'PostgreSQL'], third: ['前端', 'Vue3 / Bootstrap'] },
+  '项目经历': { first: ['时间', '2025'], second: ['项目类型', 'Python / Android'], third: ['要点', '数据采集 / 模型推理'] },
+  '荣誉成果': { first: ['奖学金', '国家奖学金'], second: ['竞赛', 'MCM / 软件测试'], third: ['成果', '大创 / 软著'] }
+};
+
+const formattedCopy = computed(() => {
+  const preset = detailCopyDefaults[props.name];
+  return preset ? makeDetailBlocks(preset) : props.copy;
+});
+
+const detailInfo = computed(() => {
+  const preset = detailInfoDefaults[props.name] || {};
+  return {
+    first: { label: preset.first?.[0] || '时间', value: props.founded || preset.first?.[1] || '' },
+    second: { label: preset.second?.[0] || '角色', value: props.invested || preset.second?.[1] || '' },
+    third: { label: preset.third?.[0] || '要点', value: props.stage || preset.third?.[1] || '' }
+  };
+});
+
 const baseDelay = ref('0s');
 const isSplitDone = ref(false);
 const onSplitDone = async (split) => {
@@ -831,11 +893,11 @@ return (_ctx, _cache) => {
             href: __props.websiteUrl
           }, toDisplayString(unref(formattedUrl)), 9, _hoisted_3))
         : createCommentVNode("", true),
-      (__props.copy)
+      (unref(formattedCopy))
         ? (openBlock(), createBlock(_component_TextSplitter, {
             key: 2,
             class: "body-copy",
-            content: __props.copy,
+            content: unref(formattedCopy),
             "line-class": "anim-fade",
             "is-rich-text": true,
             "should-restore": false,
@@ -847,22 +909,22 @@ return (_ctx, _cache) => {
         style: normalizeStyle({ '--base-delay': unref(baseDelay) }),
         class: "company-content__info ttu btn-label"
       }, [
-        (__props.founded)
+        (unref(detailInfo).first.value)
           ? (openBlock(), createElementBlock("div", _hoisted_4, [
-              _cache[0] || (_cache[0] = createBaseVNode("p", { class: "company-content__info-title" }, "Founded", -1)),
-              createBaseVNode("p", null, toDisplayString(__props.founded), 1)
+              createBaseVNode("p", { class: "company-content__info-title" }, toDisplayString(unref(detailInfo).first.label), 1),
+              createBaseVNode("p", null, toDisplayString(unref(detailInfo).first.value), 1)
             ]))
           : createCommentVNode("", true),
-        (__props.invested)
+        (unref(detailInfo).second.value)
           ? (openBlock(), createElementBlock("div", _hoisted_5, [
-              _cache[1] || (_cache[1] = createBaseVNode("p", { class: "company-content__info-title" }, "Invested", -1)),
-              createBaseVNode("p", null, toDisplayString(__props.invested), 1)
+              createBaseVNode("p", { class: "company-content__info-title" }, toDisplayString(unref(detailInfo).second.label), 1),
+              createBaseVNode("p", null, toDisplayString(unref(detailInfo).second.value), 1)
             ]))
           : createCommentVNode("", true),
-        (__props.stage)
+        (unref(detailInfo).third.value)
           ? (openBlock(), createElementBlock("div", _hoisted_6, [
-              _cache[2] || (_cache[2] = createBaseVNode("p", { class: "company-content__info-title" }, "Stage", -1)),
-              createBaseVNode("p", null, toDisplayString(__props.stage), 1)
+              createBaseVNode("p", { class: "company-content__info-title" }, toDisplayString(unref(detailInfo).third.label), 1),
+              createBaseVNode("p", null, toDisplayString(unref(detailInfo).third.value), 1)
             ]))
           : createCommentVNode("", true)
       ], 4)
@@ -879,7 +941,7 @@ const _sfc_main = {
 
 const { allCompanies } = storeToRefs(useDataStore());
 
-// ? Find current company in array from store
+// ? Find current profile item in array from store
 const route = useRoute();
 const currentCompany = computed(() =>
   allCompanies.value?.find(({ slug }) => slug === route.params.slug)
@@ -930,7 +992,7 @@ onMounted(async () => {
 });
 
 onBeforeRouteLeave((to) => {
-  if (!to.name !== 'companies-slug') {
+  if (!to.name !== 'profile-slug') {
     dispatcherSingleton.trigger({ name: 'portfolioCompanyLeave' }, {});
 
     isVisible.value = false;

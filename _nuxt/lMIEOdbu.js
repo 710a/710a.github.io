@@ -8422,11 +8422,135 @@ function useSanityQuery(query, _params, _options = {}) {
   }), { ...result, data, sourceMap, encodeDataAttribute });
 }
 
+const fallbackBlock = (text) => [
+  {
+    _key: 'fallback-block',
+    _type: 'block',
+    children: [
+      {
+        _key: 'fallback-span',
+        _type: 'span',
+        marks: [],
+        text
+      }
+    ],
+    markDefs: [],
+    style: 'normal'
+  }
+];
+
+const fallbackCompanies = [
+  {
+    slug: 'education',
+    url: '/profile/education',
+    logo: '/cdn.sanity.io/files/diak0tmr/production/8f409b899eda0a6598e1f59042a10bb28ffc3a6f.svg',
+    name: '教育背景',
+    copy: fallbackBlock('本科阶段为西北工业大学软件工程，2022 年 9 月至 2026 年 6 月，综合排名 62/266；英语四级 605、六级 552，计算机三级数据库技术优秀。已推免至西北工业大学软件工程硕士，2026 年 9 月至 2029 年 6 月，导师徐韬，智能感知交互实验室。'),
+    founded: null,
+    invested: null,
+    stage: null,
+    websiteUrl: 'https://www.nwpu.edu.cn/',
+    seo: {
+      title: '教育背景 | 胡健乐',
+      description: '胡健乐的教育背景：西北工业大学软件工程本科与推免硕士，含排名、英语与计算机等级信息。',
+      image: '/cdn.sanity.io/images/diak0tmr/production/57642f3160650fff13a36c9b7546631533865dc2-1200x630.png'
+    }
+  },
+  {
+    slug: 'skills',
+    url: '/profile/skills',
+    logo: '/cdn.sanity.io/files/diak0tmr/production/bbe762805f8a8f30923897ce054a1805b19f72ae.svg',
+    name: '技术能力',
+    copy: fallbackBlock('熟练掌握 C、Java 开发技术，能进行基础软件架构设计；熟悉 PostgreSQL，遇到数据库问题时会结合源码查找原因；熟悉 Bootstrap、Vue3，可独立开发前端网页；熟悉 Linux 操作系统。'),
+    founded: null,
+    invested: null,
+    stage: null,
+    websiteUrl: null,
+    seo: {
+      title: '技术能力 | 胡健乐',
+      description: '胡健乐的技术能力：C、Java、PostgreSQL、Bootstrap、Vue3 与 Linux。',
+      image: null
+    }
+  },
+  {
+    slug: 'projects',
+    url: '/profile/projects',
+    logo: '/cdn.sanity.io/files/diak0tmr/production/4bfda0b43330ee9caf21baa5dbb67c0a2116a383.svg',
+    name: '项目经历',
+    copy: fallbackBlock('2025 年 9 月在四川华迪公司大数据开发部门担任 Python 开发实习生，带领小组完成抗疫防疫智慧康养平台，通过爬虫采集数据，并用可视化大屏展示疫情与老年康养统计。2025 年 5 月至 6 月作为开发人员完成基于 YOLOv8 与 NCNN 的 Android 工业缺陷检测系统，覆盖缺陷检测、结果记录与数据分析，接入 OpenCV、Camera2 API、Vulkan、本地存储和相册访问。'),
+    founded: null,
+    invested: null,
+    stage: null,
+    websiteUrl: 'https://codehub.devcloud.cn-north-4.huaweicloud.com/ba19a6119a444c7f9d702760c1c59c3e/AndroidDev.git',
+    seo: {
+      title: '项目经历 | 胡健乐',
+      description: '胡健乐的项目经历：四川华迪 Python 实习、智慧康养平台，以及 YOLOv8 Android 工业缺陷检测系统。',
+      image: '/cdn.sanity.io/images/diak0tmr/production/57642f3160650fff13a36c9b7546631533865dc2-1200x630.png'
+    }
+  },
+  {
+    slug: 'honors',
+    url: '/profile/honors',
+    logo: '/cdn.sanity.io/files/diak0tmr/production/8cabc54021e8a76831d69a208c8b50042ba3b37c.svg',
+    name: '荣誉成果',
+    copy: fallbackBlock('获得 2026 年优秀毕业生、2025 年本科生国家奖学金、校级一等奖学金、校级优秀大学生与学业先进个人；2024 年获校级二等奖学金、优秀大学生、学业先进个人、学业进步先进个人、崇德先进个人，并两次获优秀共青团员。竞赛与成果包括 2025 MCM Honorable Mention、全国大学生软件测试大赛国三、蓝桥杯视觉艺术设计省二、未来设计师大赛省三、金种子杯省优胜、程序设计实验技能竞赛校二、计算机设计竞赛校三，国家级大创合格结题，以及 2024/2025 年三项软件著作权登记。'),
+    founded: null,
+    invested: null,
+    stage: null,
+    websiteUrl: null,
+    seo: {
+      title: '荣誉成果 | 胡健乐',
+      description: '胡健乐的荣誉成果：奖学金、竞赛奖项、国家级大创与软件著作权登记。',
+      image: '/cdn.sanity.io/images/diak0tmr/production/57642f3160650fff13a36c9b7546631533865dc2-1200x630.png'
+    }
+  }
+];
+
+const portraitSetA = {
+  portrait: '/cdn.sanity.io/images/diak0tmr/production/3e89d5b6a2861a68c8d521c7fed603edc5f95e2f-1024x1024.webp',
+  depthMap: '/cdn.sanity.io/images/diak0tmr/production/9a10c8de53e038349a3b8d27f81d580590adcf28-1024x1024.webp',
+  normalMap: '/cdn.sanity.io/images/diak0tmr/production/72d67cec28cba9214e0ca7978bf50bafd4e41966-1024x1024.webp'
+};
+
+const portraitSetB = {
+  portrait: '/cdn.sanity.io/images/diak0tmr/production/cc371fd0af9ea5a29fb51edeffd8c5c3171c5bfe-1024x1024.webp',
+  depthMap: '/cdn.sanity.io/images/diak0tmr/production/b67ab460249ef0f17a231d4c339fb1fd08bc9922-1024x1024.webp',
+  normalMap: '/cdn.sanity.io/images/diak0tmr/production/d96533ae3f2e0ac61cd49878394d8246a1037494-1024x1024.webp'
+};
+
+const fallbackTeamMembers = [
+  { name: '志工部负责人', position: '组织志愿活动', ...portraitSetA },
+  { name: '科学社软件部', position: '负责软件方向协作', ...portraitSetB },
+  { name: '班级心理委员', position: '关注同学状态', ...portraitSetA },
+  { name: '班级纪律委员', position: '维护课堂秩序', ...portraitSetB },
+  { name: '二星级志愿者', position: '累计服务 371 小时', ...portraitSetA },
+  { name: '公益项目参与', position: '情暖童心乡伴同行', ...portraitSetB },
+  { name: '学生大使', position: '参与校友联络服务', ...portraitSetA }
+];
+
+const fallbackGlobalData = {
+  socials: [
+    { label: '邮箱', type: 'email', url: 'mailto:1467428989@qq.com' },
+    { label: 'GitHub', type: 'external', url: 'https://github.com/710a' },
+    { label: 'CodeHub', type: 'external', url: 'https://codehub.devcloud.cn-north-4.huaweicloud.com/ba19a6119a444c7f9d702760c1c59c3e/AndroidDev.git' }
+  ],
+  footerTitle: fallbackBlock('以工程习惯整理经历\n以持续交付回应问题'),
+  footerCopyrights: '© 胡健乐 {year}',
+  legalNav: [{ label: '联系', type: 'internal', url: '/contact' }],
+  seo: {
+    title: '胡健乐 | 软件工程学生',
+    description: '胡健乐的个人介绍站点，记录软件工程学习、研究方向、项目实践与联系信息。',
+    image: '/cdn.sanity.io/images/diak0tmr/production/57642f3160650fff13a36c9b7546631533865dc2-1200x630.png'
+  }
+};
+
+const cloneFallback = (value) => JSON.parse(JSON.stringify(value));
+
 const useDataStore = defineStore('data', {
   state: () => ({
-    globalData: null,
-    allCompanies: [],
-    allTeamMembers: [],
+    globalData: cloneFallback(fallbackGlobalData),
+    allCompanies: cloneFallback(fallbackCompanies),
+    allTeamMembers: cloneFallback(fallbackTeamMembers),
     teamActiveIndex: 0
   }),
   actions: {
@@ -8444,6 +8568,18 @@ const useDataStore = defineStore('data', {
 
       this.setAllCompanies(formatCompanies(raw?.allCompanies));
       this.setAllTeamMembers(formatTeamMembers(raw?.allTeamMembers));
+    },
+
+    ensureStaticData() {
+      if (!this.globalData) {
+        this.setGlobalData(cloneFallback(fallbackGlobalData));
+      }
+      if (!this.allCompanies?.length) {
+        this.setAllCompanies(cloneFallback(fallbackCompanies));
+      }
+      if (!this.allTeamMembers?.length) {
+        this.setAllTeamMembers(cloneFallback(fallbackTeamMembers));
+      }
     },
 
     setGlobalData(payload) {
@@ -8484,7 +8620,7 @@ const formatCompanies = (companies) =>
       seo
     }) => ({
       slug: slug?.current,
-      url: `/companies/${slug?.current}`,
+      url: `/profile/${slug?.current}`,
       logo: logo?.asset?.url || null,
       name: companyName,
       copy: copy || null,

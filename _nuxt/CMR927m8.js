@@ -76,7 +76,7 @@ const startTicker = () => {
 };
 
 const ariaLabel = computed(() => {
-  return isSoundMuted.value ? 'Enable sounds' : 'Mute sounds'
+  return isSoundMuted.value ? '开启声音' : '静音'
 });
 
 const { $soundManager } = useNuxtApp();

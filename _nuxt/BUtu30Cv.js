@@ -9,10 +9,12 @@ const _sfc_main = {
 
 const { $soundManager } = useNuxtApp();
 const dataStore = useDataStore();
+dataStore.ensureStaticData();
 
 let cleanup = null;
 onMounted(async () => {
   await Sleep(1200); // Give loader time to animate to avoid jank
+  dataStore.ensureStaticData();
   await init({
     offscreen: false,
     teamMembers: dataStore.allTeamMembers

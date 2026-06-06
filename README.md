@@ -1,2 +1,3 @@
-# 临时地址是:https://hashgraphvc-static.pages.dev/
-# 友情支持：https://linux.do
+# 胡健乐个人介绍站点
+
+保留原静态站的视觉、3D 场景、滚轮翻页与详情切换交互，内容已改写为胡健乐个人介绍。

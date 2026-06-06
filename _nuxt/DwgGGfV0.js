@@ -192,7 +192,7 @@ function useSectionComponent(sectionId, options = {}) {
       if (!elementRef.value) return
 
       // Section was active when we last saw it — restore visible state immediately
-      // so components remounting after navigation (e.g. back from a company page)
+      // so components remounting after navigation (e.g. back from a profile page)
       // don't stay invisible waiting for an event that won't fire.
       animateIn();
     } else {
@@ -310,8 +310,8 @@ return (_ctx, _cache) => {
               }), 128)),
               createBaseVNode("li", null, [
                 createVNode(_component_BaseLink, {
-                  url: "https://rbxgc.co/",
-                  label: "Made by rbxgc"
+                  url: "https://github.com/710a",
+                  label: "Built by Hu Jianle"
                 })
               ])
             ]))

@@ -182,7 +182,7 @@ const onSplitDone = (split) => {
     {
       xPercent: 0,
       duration: 1.2,
-      ease: 'exPercentpoOut'
+      ease: 'expoOut'
     },
     0
   );
@@ -259,7 +259,7 @@ return (_ctx, _cache) => {
         ]),
         createBaseVNode("div", _hoisted_4$2, [
           createVNode(_component_BaseButton, {
-            label: "Back to homepage",
+            label: "返回首页",
             "on-click": onReadMoreClick
           })
         ])
@@ -267,7 +267,7 @@ return (_ctx, _cache) => {
     ]),
     createBaseVNode("div", _hoisted_5$1, [
       createVNode(_component_BaseButton, {
-        label: "Read more",
+        label: "展开",
         "on-click": onReadMoreClick,
         "is-small": true
       })
@@ -399,7 +399,7 @@ const onCopySplitDone = (split) => {
 onMounted(async () => {
   dispatcherSingleton.on('sfxPortfolioControl', handleSfxPortfolioControl);
 
-  // ? if we're coming back from company detail page, we're already scrolled to that section,
+  // ? if we are coming back from a profile detail page, we are already scrolled to that section,
   // ? so needs to anim in
   if (cachedVisible) {
     await splitPromise;
@@ -474,14 +474,14 @@ return (_ctx, _cache) => {
       ], 512),
       createBaseVNode("div", _hoisted_3$1, [
         createVNode(_component_BaseButton, {
-          label: "Back to homepage",
+          label: "返回首页",
           "on-click": onReadMoreClick
         })
       ])
     ]),
     createBaseVNode("div", _hoisted_4$1, [
       createVNode(_component_BaseButton, {
-        label: "Read more",
+        label: "展开",
         "on-click": onReadMoreClick,
         "is-small": true
       })
@@ -652,16 +652,19 @@ const _sfc_main$1 = {
 
 
 const dataStore = useDataStore();
-const { allTeamMembers, teamActiveIndex } = storeToRefs(dataStore);
+dataStore.ensureStaticData?.();
+const dataRefs = storeToRefs(dataStore);
+const allTeamMembers = dataRefs.allTeamMembers || ref(dataStore.allTeamMembers || []);
+const teamActiveIndex = dataRefs.teamActiveIndex || ref(0);
 const formattedUrls = computed(() =>
-  allTeamMembers.value?.map(({ depthMap, normalMap, portrait }) => ({
+  (allTeamMembers.value || []).map(({ depthMap, normalMap, portrait }) => ({
     raw: portrait,
     depth: depthMap,
     normal: normalMap
   }))
 );
 
-const itemsLength = computed(() => allTeamMembers.value.length);
+const itemsLength = computed(() => (allTeamMembers.value || []).length);
 const currentActive = teamActiveIndex;
 const isTransitioning = ref(false);
 
@@ -747,7 +750,7 @@ const onSplitDone = (split) => {
     {
       xPercent: 0,
       duration: 1.2,
-      ease: 'exPercentpoOut'
+      ease: 'expoOut'
     },
     0
   );
@@ -818,7 +821,7 @@ return (_ctx, _cache) => {
         ]),
         createBaseVNode("div", _hoisted_4, [
           createVNode(_component_BaseButton, {
-            label: "Back to homepage",
+            label: "返回首页",
             "on-click": onReadMoreClick
           })
         ])
@@ -847,7 +850,7 @@ return (_ctx, _cache) => {
     ]),
     createBaseVNode("div", _hoisted_7, [
       createVNode(_component_BaseButton, {
-        label: "Read more",
+        label: "展开",
         "on-click": onReadMoreClick,
         "is-small": true
       })
@@ -888,6 +891,52 @@ const homePageQuery = groq`
   }
 `;
 
+const fallbackHomeRichText = (...lines) =>
+  lines.map((text, index) => ({
+    _key: `fallback-home-${index}`,
+    _type: 'block',
+    children: [
+      {
+        _key: `fallback-home-span-${index}`,
+        _type: 'span',
+        marks: [],
+        text
+      }
+    ],
+    markDefs: [],
+    style: 'normal'
+  }));
+
+const fallbackHomePageData = {
+  data: {
+    seo: {
+      title: '胡健乐 | 软件工程学生',
+      description: '胡健乐的个人介绍站点，记录软件工程学习、研究方向、项目实践与联系信息。',
+      image: { asset: { url: '/cdn.sanity.io/images/diak0tmr/production/57642f3160650fff13a36c9b7546631533865dc2-1200x630.png' } }
+    },
+    heroSection: {
+      hero_title: fallbackHomeRichText('胡健乐', '软件工程学生'),
+      hero_cta_label: '向下浏览'
+    },
+    investorsSection: {
+      investors_section_label: '研究方向',
+      investors_title: fallbackHomeRichText('语音信号'),
+      investors_copy: '毕业论文聚焦基于语音分析的抑郁症初筛检测研究，尝试用语音特征服务心理健康早筛场景。'
+    },
+    portfolioSection: {
+      portfolio_section_label: '工程实践',
+      portfolio_title: fallbackHomeRichText('数据', '模型', '界面'),
+      portfolio_copy: '把需求拆成可测试任务，围绕数据采集、模型验证、前端呈现和文档沉淀推进，每一步都保留可复查的交付物。',
+      portfolio_cta_label: '查看详细履历'
+    },
+    teamSection: {
+      team_section_label: '协作方式',
+      team_title: fallbackHomeRichText('记录', '同步'),
+      team_copy: '从班级心理委员、纪律委员到志工部与科学社软件部负责人，习惯在团队里承担沟通、记录和服务职责。'
+    }
+  }
+};
+
 // ? Home data fetch
 
 const _sfc_main = {
@@ -895,19 +944,24 @@ const _sfc_main = {
   async setup(__props) {
 
 let __temp, __restore;
+let queryResult;
 
-const { data } = (
-  ([__temp,__restore] = withAsyncContext(() => useSanityQuery(homePageQuery))),
-  __temp = await __temp,
-  __restore(),
-  __temp
-);
+try {
+  queryResult = (
+    ([__temp,__restore] = withAsyncContext(() => useSanityQuery(homePageQuery))),
+    __temp = await __temp,
+    __restore(),
+    __temp
+  );
+} catch (error) {
+  __restore?.();
+  queryResult = { data: ref(fallbackHomePageData) };
+}
 
-if (!data?.value) {
-  throw createError({
-    statusCode: 404,
-    statusMessage: 'Page not found'
-  })
+const { data } = queryResult;
+
+if (!data?.value?.data) {
+  data.value = fallbackHomePageData;
 }
 
 // ? SEO data
@@ -943,7 +997,10 @@ const investors = computed(() => {
 });
 
 // ? Portfolio data
-const { allCompanies } = storeToRefs(useDataStore());
+const homeDataStore = useDataStore();
+homeDataStore.ensureStaticData?.();
+const homeDataRefs = storeToRefs(homeDataStore);
+const allCompanies = homeDataRefs.allCompanies || ref(homeDataStore.allCompanies || []);
 const portfolio = computed(() => {
   const { portfolioSection } = data.value.data;
 

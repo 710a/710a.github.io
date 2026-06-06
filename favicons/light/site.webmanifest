@@ -3,7 +3,7 @@
   "short_name": "胡健乐",
   "icons": [
     {
-      "src": "/favicons/dark/favicon.svg",
+      "src": "/favicons/light/favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
